@@ -265,7 +265,7 @@ const ProjectCard: React.FC<ProjectCardProps> = React.memo(
                           Here you can add a more detailed description about the project, the challenges you faced, the solutions you implemented, and the impact of the final product.
                         </p>
                         <p>
-                          Currently, this text is a placeholder since you haven't added a <code className="text-cyan-400 bg-cyan-500/10 px-1 rounded">detailedDescription</code> field to this project in your page data yet!
+                          Currently, this text is a placeholder since you haven&apos;t added a <code className="text-cyan-400 bg-cyan-500/10 px-1 rounded">detailedDescription</code> field to this project in your page data yet!
                         </p>
                         <p>
                           Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.

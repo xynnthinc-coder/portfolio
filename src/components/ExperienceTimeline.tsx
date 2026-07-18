@@ -3,10 +3,6 @@
 import React, { useRef } from "react";
 import { motion, useScroll, useSpring, useTransform } from "framer-motion";
 import Image from "next/image";
-import { desc } from "framer-motion/client";
-import ScrollReveal from "@/blocks/TextAnimations/ScrollReveal/ScrollReveal";
-// Removed unused import
-// import { comma } from 'postcss/lib/list';
 
 const experiences = [
   // ... your experiences array - Keep this array as is

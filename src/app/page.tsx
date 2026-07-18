@@ -3,21 +3,17 @@
 "use client"
 
 import React from "react";
-import Image from "next/image";
 
 // Import your components and blocks
 import BlurText from "@/blocks/TextAnimations/BlurText/BlurText";
 import TrueFocus from "@/blocks/TextAnimations/TrueFocus/TrueFocus";
 import Threads from "@/blocks/Backgrounds/Threads/Threads";
-import CircularText from "@/blocks/TextAnimations/CircularText/CircularText";
 import TiltedCard from "@/blocks/Components/TiltedCard/TiltedCard";
 import ExperienceTimeline from '@/components/ExperienceTimeline';
 import SkillTag from '@/components/SkillTag';
 import ProjectCard from '@/components/ProjectCard';
-import Lanyard from '@/components/Lanyard';
 import ScrollVelocity from '@/blocks/TextAnimations/ScrollVelocity/ScrollVelocity';
 import AboutMe from '@/components/AboutMe';
-import StatsSection from '@/components/StatsSection';
 
 // Define your projects array
 const projects = [
