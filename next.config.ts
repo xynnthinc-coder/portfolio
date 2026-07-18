@@ -4,26 +4,9 @@ const nextConfig: NextConfig = {
   typescript: {
     ignoreBuildErrors: true,
   },
-  webpack: (config, { dev }) => {
-    // Add support for .glb files
-    config.module.rules.push({
-      test: /\.glb$/,
-      type: 'asset/resource',
-    });
 
-    // Add support for .gltf files
-    config.module.rules.push({
-      test: /\.gltf$/,
-      type: 'asset/resource',
-    });
-
-    // Disable source maps in development for faster builds
-    if (dev) {
-      config.devtool = false;
-    }
-
-    return config;
-  },
+  // Explicitly set turbopack config to avoid "webpack config but no turbopack config" error in Next.js 16
+  turbopack: {},
 
   // Tree-shake heavy libraries — hanya import yang dipakai yang di-bundle
   experimental: {
