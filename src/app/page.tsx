@@ -2,7 +2,7 @@
 
 "use client"
 
-import React from "react";
+import React, { useState, useEffect } from "react";
 import dynamic from "next/dynamic";
 
 // Above-the-fold components — imported eagerly (visible immediately)
@@ -75,18 +75,33 @@ const contentSkills = [
 ];
 
 export default function Home() {
+  // Skip WebGL entirely on mobile — saves a full WebGL context + shader pipeline
+  const [isDesktop, setIsDesktop] = useState(false);
+  useEffect(() => {
+    const mql = window.matchMedia('(min-width: 768px)');
+    setIsDesktop(mql.matches);
+    const handler = (e: MediaQueryListEvent) => setIsDesktop(e.matches);
+    mql.addEventListener('change', handler);
+    return () => mql.removeEventListener('change', handler);
+  }, []);
+
   return (
     <>
       {/* Main content area */}
-      <main className="flex-grow flex flex-col items-center h-full relative pt-20"> {/* Added padding top to account for fixed header */}
-        {/* Single Threads instance — CSS controls visibility per breakpoint */}
-        <div style={{ width: '100%', height: '600px', position: 'absolute', bottom: '50'}} className="opacity-100 md:opacity-100 max-md:opacity-10">
-          <Threads
-            amplitude={2.5}
-            distance={0}
-            enableMouseInteraction={false}
-          />
-        </div>
+      <main className="flex-grow flex flex-col items-center h-full relative pt-20">
+        {/* Threads only on desktop — mobile gets a lightweight CSS fallback */}
+        {isDesktop ? (
+          <div style={{ width: '100%', height: '600px', position: 'absolute', bottom: '50'}}>
+            <Threads
+              amplitude={2.5}
+              distance={0}
+              enableMouseInteraction={false}
+            />
+          </div>
+        ) : (
+          <div style={{ width: '100%', height: '600px', position: 'absolute', bottom: '50', opacity: 0.08 }}
+               className="bg-gradient-to-r from-transparent via-white/5 to-transparent" />
+        )}
 
         {/* ... other main content elements ... */}
         <div className="w-full flex justify-center items-center my-4 md:mt-15 text-center font-bold relative px-4 md:px-0">

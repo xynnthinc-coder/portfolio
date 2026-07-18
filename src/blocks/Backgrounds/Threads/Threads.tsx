@@ -34,7 +34,7 @@ uniform vec2 uMouse;
 
 #define PI 3.1415926538
 
-const int u_line_count = 40;
+const int u_line_count = 30;
 const float u_line_width = 7.0;
 const float u_line_blur = 10.0;
 
@@ -138,10 +138,20 @@ const Threads: React.FC<ThreadsProps> = ({
 }) => {
 	const containerRef = useRef<HTMLDivElement>(null);
 	const animationFrameId = useRef<number>(0);
+	const isVisibleRef = useRef<boolean>(true);
 
 	useEffect(() => {
 		if (!containerRef.current) return;
 		const container = containerRef.current;
+
+		// IntersectionObserver — pause render loop when off-screen
+		const observer = new IntersectionObserver(
+			([entry]) => {
+				isVisibleRef.current = entry.isIntersecting;
+			},
+			{ threshold: 0 }
+		);
+		observer.observe(container);
 
 		let renderer;
 		try {
@@ -206,6 +216,11 @@ const Threads: React.FC<ThreadsProps> = ({
 		}
 
 		function update(t: number) {
+			animationFrameId.current = requestAnimationFrame(update);
+
+			// Skip rendering when off-screen — saves GPU cycles
+			if (!isVisibleRef.current) return;
+
 			if (enableMouseInteraction) {
 				const smoothing = 0.05;
 				currentMouse[0] += smoothing * (targetMouse[0] - currentMouse[0]);
@@ -219,11 +234,11 @@ const Threads: React.FC<ThreadsProps> = ({
 			program.uniforms.iTime.value = t * 0.001;
 
 			renderer.render({ scene: mesh });
-			animationFrameId.current = requestAnimationFrame(update);
 		}
 		animationFrameId.current = requestAnimationFrame(update);
 
 		return () => {
+			observer.disconnect();
 			if (animationFrameId.current)
 				cancelAnimationFrame(animationFrameId.current);
 			window.removeEventListener("resize", resize);

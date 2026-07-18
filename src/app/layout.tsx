@@ -95,31 +95,31 @@ export default function RootLayout({
     return false;
   });
 
-  // --- Lenis Smooth Scrolling Implementation ---
+  // --- Lenis Smooth Scrolling (desktop only — native scroll is smoother on mobile) ---
   const lenis = useRef<Lenis | null>(null);
-  const rafId = useRef<number | null>(null);
+  const lenisRafId = useRef<number | null>(null);
 
   useEffect(() => {
-    if (typeof window !== 'undefined') {
-      lenis.current = new Lenis({
-        duration: 1.2,
-        easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
-        smoothWheel: true,
-      });
+    if (!isDesktop) return;
 
-      function raf(time: number) {
-        lenis.current?.raf(time);
-        rafId.current = requestAnimationFrame(raf);
-      }
+    lenis.current = new Lenis({
+      duration: 1.2,
+      easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+      smoothWheel: true,
+    });
 
-      rafId.current = requestAnimationFrame(raf);
-
-      return () => {
-        if (rafId.current) cancelAnimationFrame(rafId.current);
-        lenis.current?.destroy();
-      };
+    function raf(time: number) {
+      lenis.current?.raf(time);
+      lenisRafId.current = requestAnimationFrame(raf);
     }
-  }, []);
+
+    lenisRafId.current = requestAnimationFrame(raf);
+
+    return () => {
+      if (lenisRafId.current) cancelAnimationFrame(lenisRafId.current);
+      lenis.current?.destroy();
+    };
+  }, [isDesktop]);
   // --- End Lenis Implementation ---
 
 

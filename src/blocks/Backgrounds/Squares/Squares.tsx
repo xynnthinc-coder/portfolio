@@ -32,6 +32,7 @@ const Squares: React.FC<SquaresProps> = ({
 	const numSquaresY = useRef<number>(0);
 	const gridOffset = useRef<GridOffset>({ x: 0, y: 0 });
 	const hoveredSquareRef = useRef<GridOffset | null>(null);
+	const isVisibleRef = useRef<boolean>(false);
 
 	useEffect(() => {
 		const canvas = canvasRef.current;
@@ -92,6 +93,11 @@ const Squares: React.FC<SquaresProps> = ({
 		};
 
 		const updateAnimation = () => {
+			requestRef.current = requestAnimationFrame(updateAnimation);
+
+			// Skip when off-screen
+			if (!isVisibleRef.current) return;
+
 			const effectiveSpeed = Math.max(speed, 0.1);
 			switch (direction) {
 				case "right":
@@ -121,7 +127,6 @@ const Squares: React.FC<SquaresProps> = ({
 			}
 
 			drawGrid();
-			requestRef.current = requestAnimationFrame(updateAnimation);
 		};
 
 		const handleMouseMove = (event: MouseEvent) => {
@@ -152,11 +157,19 @@ const Squares: React.FC<SquaresProps> = ({
 			hoveredSquareRef.current = null;
 		};
 
+		// IntersectionObserver — pause animation when off-screen
+		const observer = new IntersectionObserver(
+			([entry]) => { isVisibleRef.current = entry.isIntersecting; },
+			{ threshold: 0 }
+		);
+		observer.observe(canvas);
+
 		canvas.addEventListener("mousemove", handleMouseMove);
 		canvas.addEventListener("mouseleave", handleMouseLeave);
 		requestRef.current = requestAnimationFrame(updateAnimation);
 
 		return () => {
+			observer.disconnect();
 			window.removeEventListener("resize", resizeCanvas);
 			if (requestRef.current) cancelAnimationFrame(requestRef.current);
 			canvas.removeEventListener("mousemove", handleMouseMove);

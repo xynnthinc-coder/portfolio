@@ -68,6 +68,7 @@ const DotGrid: React.FC<DotGridProps> = ({
   const wrapperRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const dotsRef = useRef<Dot[]>([]);
+  const isVisibleRef = useRef<boolean>(false);
   const pointerRef = useRef({
     x: 0,
     y: 0,
@@ -129,6 +130,18 @@ const DotGrid: React.FC<DotGridProps> = ({
     dotsRef.current = dots;
   }, [dotSize, gap]);
 
+  // IntersectionObserver — pause canvas loop when off-screen
+  useEffect(() => {
+    const wrapper = wrapperRef.current;
+    if (!wrapper) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => { isVisibleRef.current = entry.isIntersecting; },
+      { threshold: 0 }
+    );
+    observer.observe(wrapper);
+    return () => observer.disconnect();
+  }, []);
+
   useEffect(() => {
     if (!circlePath) return;
 
@@ -136,6 +149,11 @@ const DotGrid: React.FC<DotGridProps> = ({
     const proxSq = proximity * proximity;
 
     const draw = () => {
+      rafId = requestAnimationFrame(draw);
+
+      // Skip drawing when off-screen
+      if (!isVisibleRef.current) return;
+
       const canvas = canvasRef.current;
       if (!canvas) return;
       const ctx = canvas.getContext('2d');
@@ -167,8 +185,6 @@ const DotGrid: React.FC<DotGridProps> = ({
         ctx.fill(circlePath);
         ctx.restore();
       }
-
-      rafId = requestAnimationFrame(draw);
     };
 
     draw();
