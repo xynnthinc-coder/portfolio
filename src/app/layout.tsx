@@ -1,15 +1,12 @@
-'use client'; // This layout uses client-side hooks and event listeners
+'use client';
 
-// Include imports for Lenis AND the cursor
 import React, { useEffect, useRef, useState } from 'react';
 import Lenis from '@studio-freight/lenis';
 import { motion, useMotionValue, useSpring } from "framer-motion";
 import Image from "next/image";
 import GooeyNav from "@/blocks/Components/GooeyNav/GooeyNav";
 import { usePathname } from 'next/navigation';
-// Import the Link component from next/link
 import Link from 'next/link';
-
 
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
@@ -73,6 +70,17 @@ export default function RootLayout({
   const [mobileDropdownOpen, setMobileDropdownOpen] = useState<string | null>(null);
   const [mobileSubmenuOpen, setMobileSubmenuOpen] = useState<string | null>(null);
   
+  // Desktop detection for cursor — prevents spring animations from running on mobile
+  const [isDesktop, setIsDesktop] = useState(false);
+  
+  useEffect(() => {
+    const mql = window.matchMedia('(min-width: 768px)');
+    setIsDesktop(mql.matches);
+    const handler = (e: MediaQueryListEvent) => setIsDesktop(e.matches);
+    mql.addEventListener('change', handler);
+    return () => mql.removeEventListener('change', handler);
+  }, []);
+  
   // Get current pathname
   const pathname = usePathname();
 
@@ -89,6 +97,7 @@ export default function RootLayout({
 
   // --- Lenis Smooth Scrolling Implementation ---
   const lenis = useRef<Lenis | null>(null);
+  const rafId = useRef<number | null>(null);
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
@@ -100,12 +109,13 @@ export default function RootLayout({
 
       function raf(time: number) {
         lenis.current?.raf(time);
-        requestAnimationFrame(raf);
+        rafId.current = requestAnimationFrame(raf);
       }
 
-      requestAnimationFrame(raf);
+      rafId.current = requestAnimationFrame(raf);
 
       return () => {
+        if (rafId.current) cancelAnimationFrame(rafId.current);
         lenis.current?.destroy();
       };
     }
@@ -113,7 +123,7 @@ export default function RootLayout({
   // --- End Lenis Implementation ---
 
 
-  // --- Custom Cursor Implementation ---
+  // --- Custom Cursor Implementation (desktop only) ---
   const cursorX = useMotionValue(0);
   const cursorY = useMotionValue(0);
 
@@ -127,6 +137,8 @@ export default function RootLayout({
   const outlineY = useSpring(dotY, outlineSpringConfig);
 
   useEffect(() => {
+    if (!isDesktop) return;
+    
     const moveCursor = (e: MouseEvent) => {
       cursorX.set(e.clientX);
       cursorY.set(e.clientY);
@@ -142,7 +154,7 @@ export default function RootLayout({
     return () => {
       window.removeEventListener('mousemove', moveCursor);
     };
-  }, [cursorX, cursorY]);
+  }, [cursorX, cursorY, isDesktop]);
   // --- End Custom Cursor Implementation ---
 
 
@@ -150,46 +162,47 @@ export default function RootLayout({
     <html lang="en">
       <body
         className={`${geistSans.variable} ${geistMono.variable} ${gilroy.variable} antialiased font-gilroy bg-black`}
-        style={{ cursor: 'none' }}
+        style={{ cursor: isDesktop ? 'none' : 'auto' }}
         >
-        {/* Custom Cursor Dot */}
-        <motion.div 
-            style={{
-            x: dotX,
-            y: dotY,
-            pointerEvents: 'none',
-            left: 0,
-            top: 0,
-            position: 'fixed',
-            zIndex: 9999,
-            transform: 'translate(-50%, -50%)',
-            width: '8px',
-            height: '8px',
-            borderRadius: '50%',
-            backgroundColor: '#06b6d4',
-            boxShadow: '0 0 10px 4px rgba(6, 182, 212, 0.7)',
-            }}
-            className="hidden md:block"
-        />
-        {/* Custom Cursor Outline */}
-        <motion.div
-            style={{
-            x: outlineX,
-            y: outlineY,
-            pointerEvents: 'none',
-            left: 0,
-            top: 0,
-            position: 'fixed',
-            zIndex: 9998,
-            transform: 'translate(-50%, -50%)',
-            width: '30px',
-            height: '30px',
-            borderRadius: '50%',
-            border: '2px solid #0891b2',
-            opacity: 0.5,
-            }}
-            className="hidden md:block"
-        />
+        {/* Custom Cursor — only rendered on desktop to avoid spring overhead on mobile */}
+        {isDesktop && (
+          <>
+            <motion.div 
+                style={{
+                x: dotX,
+                y: dotY,
+                pointerEvents: 'none',
+                left: 0,
+                top: 0,
+                position: 'fixed',
+                zIndex: 9999,
+                transform: 'translate(-50%, -50%)',
+                width: '8px',
+                height: '8px',
+                borderRadius: '50%',
+                backgroundColor: '#06b6d4',
+                boxShadow: '0 0 10px 4px rgba(6, 182, 212, 0.7)',
+                }}
+            />
+            <motion.div
+                style={{
+                x: outlineX,
+                y: outlineY,
+                pointerEvents: 'none',
+                left: 0,
+                top: 0,
+                position: 'fixed',
+                zIndex: 9998,
+                transform: 'translate(-50%, -50%)',
+                width: '30px',
+                height: '30px',
+                borderRadius: '50%',
+                border: '2px solid #0891b2',
+                opacity: 0.5,
+                }}
+            />
+          </>
+        )}
         {/* Header Section */}
         <header className="sticky top-0 z-50 flex w-full items-center justify-between px-4 py-2 md:px-8 md:py-3 bg-transparent backdrop-blur-[3px]">
           {/* Logo */}

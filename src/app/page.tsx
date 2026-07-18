@@ -3,17 +3,20 @@
 "use client"
 
 import React from "react";
+import dynamic from "next/dynamic";
 
-// Import your components and blocks
+// Above-the-fold components — imported eagerly (visible immediately)
 import BlurText from "@/blocks/TextAnimations/BlurText/BlurText";
 import TrueFocus from "@/blocks/TextAnimations/TrueFocus/TrueFocus";
 import Threads from "@/blocks/Backgrounds/Threads/Threads";
-import TiltedCard from "@/blocks/Components/TiltedCard/TiltedCard";
-import ExperienceTimeline from '@/components/ExperienceTimeline';
 import SkillTag from '@/components/SkillTag';
-import ProjectCard from '@/components/ProjectCard';
-import ScrollVelocity from '@/blocks/TextAnimations/ScrollVelocity/ScrollVelocity';
-import AboutMe from '@/components/AboutMe';
+
+// Below-the-fold components — lazy loaded (only loaded when scrolled into view)
+const TiltedCard = dynamic(() => import("@/blocks/Components/TiltedCard/TiltedCard"), { ssr: false });
+const ExperienceTimeline = dynamic(() => import("@/components/ExperienceTimeline"), { ssr: false });
+const ProjectCard = dynamic(() => import("@/components/ProjectCard"), { ssr: false });
+const ScrollVelocity = dynamic(() => import("@/blocks/TextAnimations/ScrollVelocity/ScrollVelocity"), { ssr: false });
+const AboutMe = dynamic(() => import("@/components/AboutMe"), { ssr: false });
 
 // Define your projects array
 const projects = [
@@ -76,15 +79,8 @@ export default function Home() {
     <>
       {/* Main content area */}
       <main className="flex-grow flex flex-col items-center h-full relative pt-20"> {/* Added padding top to account for fixed header */}
-        <div style={{ width: '100%', height: '600px', position: 'absolute', bottom: '50'}} className="hidden md:block">
-          <Threads
-            amplitude={2.5}
-            distance={0}
-            enableMouseInteraction={false}
-          />
-        </div>
-
-        <div style={{ width: '100%', height: '600px', position: 'absolute', bottom: '50'}} className="md:hidden opacity-10">
+        {/* Single Threads instance — CSS controls visibility per breakpoint */}
+        <div style={{ width: '100%', height: '600px', position: 'absolute', bottom: '50'}} className="opacity-100 md:opacity-100 max-md:opacity-10">
           <Threads
             amplitude={2.5}
             distance={0}
@@ -114,25 +110,6 @@ export default function Home() {
             pauseBetweenAnimations={1}
             />
           </div>
-
-        {/* style jsx block is fine */}
-        <style jsx>{`
-          @keyframes fadeIn {
-            from {
-              opacity: 0;
-              transform: translateY(10px);
-            }
-            to {
-              opacity: 1;
-              transform: translateY(0);
-            }
-          }
-
-          .animate-fadeIn {
-            animation: fadeIn 1s ease-out forwards;
-            animation-delay: 0.8s;
-          }
-        `}</style>
 
         <div className="w-full items-center mt-60 mb-4 relative h-[300px] hidden md:block">
           <ScrollVelocity

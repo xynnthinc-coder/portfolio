@@ -164,13 +164,11 @@ const RollingGallery: React.FC<RollingGalleryProps> = ({
                                 }}
                             >
                                 <Image
-                                    width={300} // Added width for Image component
-                                    height={300} // Added height for Image component
-                                    unoptimized
-                                    priority
+                                    width={300}
+                                    height={300}
                                     src={url}
                                     alt="gallery"
-                                    className="pointer-events-none rounded-[15px] border-[3px] border-white object-cover transition-transform duration-300 ease-out group-hover:scale-105 w-[200px] h-[190px] md:h-[270px] md:w-[310px]" // <-- Increased height here
+                                    className="pointer-events-none rounded-[15px] border-[3px] border-white object-cover transition-transform duration-300 ease-out group-hover:scale-105 w-[200px] h-[190px] md:h-[270px] md:w-[310px]"
                                 />
                             </div>
                         );

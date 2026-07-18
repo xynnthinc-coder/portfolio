@@ -1,10 +1,13 @@
 'use client';
 
 import React from 'react';
+import dynamic from 'next/dynamic';
 import BlurText from '@/blocks/TextAnimations/BlurText/BlurText';
 import ShinyText from '@/blocks/TextAnimations/ShinyText/ShinyText';
 import AnimatedContent from '@/blocks/Components/AnimatedContent/AnimatedContent';
-import DotGrid from '@/blocks/Backgrounds/DotGrid/DotGrid';
+
+// Lazy load DotGrid — it pulls in GSAP + InertiaPlugin (~50KB) and runs a canvas render loop
+const DotGrid = dynamic(() => import('@/blocks/Backgrounds/DotGrid/DotGrid'), { ssr: false });
 
 export default function AboutMe() {
   return (
